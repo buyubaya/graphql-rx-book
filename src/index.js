@@ -6,11 +6,15 @@ import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 // APOLLO
-import ApolloClient from "apollo-boost";
-import { ApolloProvider } from "react-apollo";
+import { ApolloClient } from 'apollo-client';
+import { ApolloProvider } from 'react-apollo';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+import { createUploadLink } from 'apollo-upload-client';
 // APOLLO CLIENT
 const client = new ApolloClient({
-	uri: 'http://localhost:4000/graphql'
+    // uri: 'http://localhost:3001/graphql',
+    cache: new InMemoryCache().restore(),
+    link: createUploadLink({ uri: 'http://localhost:4000/graphql' })
 });
 
 

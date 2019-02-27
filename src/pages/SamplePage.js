@@ -13,14 +13,57 @@ query book($id: ID, $page: Int){
 }`;
 
 const LOGIN_MUTATION = gql`
-    mutation login($username: String!, $password: String!, $file: Upload) {
+    mutation($username: String!, $password: String!, $file: Upload) {
         login(username: $username, password: $password, file: $file) {
             token
             error
         }
     }
 `;
-
+// const uploadsQuery = gql`
+// query uploads {
+//     uploads {
+//         id
+//         filename
+//         mimetype
+//         path
+//     }
+// }
+// `;
+// let UploadFile = ({ mutate }) => {
+//     const handleChange = ({
+//       target: {
+//         validity,
+//         files: [file]
+//       }
+//     }) =>
+//       validity.valid &&
+//       mutate({
+//         variables: { file },
+//         update(
+//           proxy,
+//           {
+//             data: { singleUpload }
+//           }
+//         ) {
+//           const data = proxy.readQuery({ query: uploadsQuery })
+//           data.uploads.push(singleUpload)
+//           proxy.writeQuery({ query: uploadsQuery, data })
+//         }
+//       })
+  
+//     return <input type="file" required onChange={handleChange} />
+// };
+// UploadFile = graphql(gql`
+//     mutation($file: Upload!) {
+//         singleUpload(file: $file) {
+//             id
+//             filename
+//             mimetype
+//             path
+//         }
+//     }
+// `)(UploadFile);
 
 class SamplePage extends React.Component {
     constructor(){
@@ -39,8 +82,14 @@ class SamplePage extends React.Component {
     }
 
     handleClick = () => {
+        const [file] = this.file.files;
+        console.log('FILE', file, this.file.validity);
         this.props.login && this.props.login({
-            variables: {username: this.username.value, password: this.password.value}
+            variables: {
+                username: this.username.value, 
+                password: this.password.value,
+                file
+            }
         })
         .then(({ data }) => {
             this.setState({ loginError: data && data.login.error });
@@ -107,9 +156,11 @@ class SamplePage extends React.Component {
                     )
                 }
                 <button onClick={this.handleLoadMore}>LOAD MORE</button>
+                
                 <div>
                     <input type='text' ref={el => this.username = el} />
                     <input type='password' ref={el => this.password = el} />
+                    <input type='file' ref={el => this.file = el} />
                     <button 
                         onClick={this.handleClick}
                     >
@@ -144,3 +195,4 @@ export default compose(
     graphql(BOOK_QUERY, {name: 'bookQuery'}),
     graphql(LOGIN_MUTATION, {name: 'login'})
 )(SamplePage);
+// export default UploadFile;
