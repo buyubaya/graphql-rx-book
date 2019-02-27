@@ -11,9 +11,9 @@ class AdminPage extends React.Component {
     }
 
     componentDidMount(){
-        const { login } = this.props;
+        const { updateLoginUser } = this.props;
         let user = this._getUser();
-        user && login && login(user);
+        updateLoginUser && updateLoginUser(user);
     }
 
     _getUser(){
@@ -30,27 +30,27 @@ class AdminPage extends React.Component {
         
         return (
             user.username
-                ?
-                <div className='wrap-lg'>
-                    <div className='admin-header row'>
-                        <ul className='admin-nav fl'>
-                            <CustomLink to='/' exact>Home</CustomLink>
-                            <CustomLink to='/admin/book'>Admin - Books</CustomLink>
-                        </ul>
-                        <ul className='admin-nav fr'>
-                            {
-                                (user && user.username)
-                                ?
-                                <CustomLink to='/user/logout'>Log out</CustomLink>
-                                :
-                                <CustomLink to='/user/login'>Log in</CustomLink>
-                            }
-                        </ul>
-                    </div>
-                    {this.props.children}
+            ?
+            <div className='wrap-lg'>
+                <div className='admin-header row'>
+                    <ul className='admin-nav fl'>
+                        <CustomLink to='/' exact>Home</CustomLink>
+                        <CustomLink to='/admin/book'>Admin - Books</CustomLink>
+                    </ul>
+                    <ul className='admin-nav fr'>
+                        {
+                            (user && user.username)
+                            ?
+                            <CustomLink to='/user/logout'>Log out</CustomLink>
+                            :
+                            <CustomLink to='/user/login'>Log in</CustomLink>
+                        }
+                    </ul>
                 </div>
-                :
-                <Redirect to='/user/login' />
+                {this.props.children}
+            </div>
+            :
+            <Redirect to='/user/login' />
         );
     }
 }
@@ -61,6 +61,6 @@ export default connect(
         user: state.user
     }),
     dispatch => ({
-        login: user => dispatch({ type: 'FETCH_USER_SUCCESS', payload: user })
-    }) 
+        updateLoginUser: user => dispatch({ type: 'FETCH_USER_SUCCESS', payload: user })
+    })
 )(AdminPage);

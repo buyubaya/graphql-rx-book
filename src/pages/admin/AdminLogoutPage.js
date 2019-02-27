@@ -15,7 +15,9 @@ class AdminLogoutPage extends React.Component {
     componentDidMount(){
         const { logout } = this.props;
         sessionStorage.removeItem('user');
-        logout && logout({});
+        setTimeout(() => {
+            logout && logout({});
+        }, 0);
         console.log('LOG OUT');
     }
 

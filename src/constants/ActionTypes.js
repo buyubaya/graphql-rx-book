@@ -9,6 +9,8 @@ export const IS_FILTERED = 'IS_FILTERED';
 export const CLEAR_FILTER = 'CLEAR_FILTER';
 export const SHOW_ALERT = 'SHOW_ALERT';
 export const HIDE_ALERT = 'HIDE_ALERT';
+export const IS_LOADING = 'IS_LOADING';
+export const STOP_LOADING = 'STOP_LOADING';
 
 // CART
 export const UPDATE_CART = 'UPDATE_CART';

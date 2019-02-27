@@ -13,8 +13,8 @@ query book($id: ID, $page: Int){
 }`;
 
 const LOGIN_MUTATION = gql`
-    mutation login($username: String!, $password: String!) {
-        login(username: $username, password: $password) {
+    mutation login($username: String!, $password: String!, $file: Upload) {
+        login(username: $username, password: $password, file: $file) {
             token
             error
         }
@@ -50,7 +50,6 @@ class SamplePage extends React.Component {
 
     handleLoadMore = () => {
         const { fetchMore } = this.props.bookQuery;
-        console.log('LOAD MORE');
         fetchMore && fetchMore({
             variables: { page: 2 },
             updateQuery: (prevResult, { fetchMoreResult }) => ({

@@ -3,12 +3,18 @@ import {
     FETCH_PRODUCT_SUCCESS,
     IS_FILTERED,
     SHOW_ALERT,
-    HIDE_ALERT
+	HIDE_ALERT,
+	IS_LOADING,
+	STOP_LOADING
 } from '../../constants/ActionTypes';
 
 
 const statusReducer = (state={}, action) => {
 	switch(action.type){
+		case IS_LOADING:
+			return {...state, isLoading: true};
+		case STOP_LOADING:
+			return {...state, isLoading: false};
 		case FETCH_PRODUCT_REQUEST:
 			return {...state, isLoading: true};
 		case FETCH_PRODUCT_SUCCESS:

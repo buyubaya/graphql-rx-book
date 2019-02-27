@@ -5,7 +5,7 @@ import {
 } from '../redux/actions';
 
 
-const Pagination = ({page, limit, count, toPage, maxPage}) => {
+const Pagination = ({page, limit, count, onPageChange, maxPage}) => {
 	let totalPage = Math.ceil(count / limit);
 	let startPage = page - (Math.ceil(maxPage / 2) - 1);
 	let endPage = page + Math.floor(maxPage / 2);
@@ -32,19 +32,19 @@ const Pagination = ({page, limit, count, toPage, maxPage}) => {
 			{
 			startPage > 1 &&
 			[
-				<li key={1}><a href="javascript:;" onClick={() => toPage(1)}>&lt;</a></li>,
-				<li key={'prevPageGroup'}><a href="javascript:;" onClick={() => toPage(page - maxPage < 1 ? 1 : page - maxPage)}>...</a></li>
+				<li key={1}><a href="javascript:;" onClick={() => onPageChange(1)}>&lt;</a></li>,
+				<li key={'prevPageGroup'}><a href="javascript:;" onClick={() => onPageChange(page - maxPage < 1 ? 1 : page - maxPage)}>...</a></li>
 			]
 			}
 			{
 			pArr.map((item) => {
-				return <li className={item == page ? 'is-active' : ''} key={item} onClick={() => toPage(item)}><a href="javascript:;">{item}</a></li>})
+				return <li className={item == page ? 'is-active' : ''} key={item} onClick={() => onPageChange(item)}><a href="javascript:;">{item}</a></li>})
 			}
 			{
 			endPage < totalPage &&
 			[
-				<li key={'nextPageGroup'}><a href="javascript:;" onClick={() => toPage(page + maxPage > totalPage ? totalPage : page + maxPage)}>...</a></li>,
-				<li key={totalPage}><a href="javascript:;" onClick={() => toPage(totalPage)}>&gt;</a></li>
+				<li key={'nextPageGroup'}><a href="javascript:;" onClick={() => onPageChange(page + maxPage > totalPage ? totalPage : page + maxPage)}>...</a></li>,
+				<li key={totalPage}><a href="javascript:;" onClick={() => onPageChange(totalPage)}>&gt;</a></li>
 			]
 			}
 		</ul>
@@ -54,9 +54,10 @@ const Pagination = ({page, limit, count, toPage, maxPage}) => {
 };
 
 
-export default connect(
-	null,
-	dispatch => ({
-		toPage: page => dispatch(filterRequest({ page }))
-	})
-)(Pagination);
+// export default connect(
+// 	null,
+// 	dispatch => ({
+// 		toPage: page => dispatch(filterRequest({ page }))
+// 	})
+// )(Pagination);
+export default Pagination;

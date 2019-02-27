@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import { withFormik } from 'formik';
@@ -8,6 +9,18 @@ import {
     USER_API_URL
 } from '../../constants/ApiUrls';
 // APOLLO
+import { graphql } from "react-apollo";
+import gql from "graphql-tag";
+// QUERY AND MUTATION
+const LOGIN_MUTATION = gql`
+    mutation login($username: String!, $password: String!) {
+        login(username: $username, password: $password) {
+            username
+            token
+            error
+        }
+    }
+`;
 
 
 const LoginFormBuilder = withFormik({
@@ -39,35 +52,54 @@ const LoginFormBuilder = withFormik({
 
     handleSubmit: (values, { setSubmitting, validateForm, resetForm, setError, props }) => {
         validateForm();
-        fetch(`${USER_API_URL}/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json' 
-            },
-            body: JSON.stringify({
-                username: values.username,
-                password: values.password
-            })
+        const { login } = props;
+        login && login({
+            variables: {username: values.username, password: values.password}
         })
         .then(
-            res => {
-                if(res.status === 200){
-                    return res.json();
-                }
-                throw new Error(res.statusText);
-            }
-        )
-        .then(
-            json => {
+            ({ data }) => {
                 setSubmitting(false);
-                resetForm();
-                console.log('JSON', json);
-                props.onSubmitSuccess && props.onSubmitSuccess(json);
+                if(data && data.login.error){  
+                    setError({_form: data.login.error});
+                }
+                else {
+                    resetForm();
+                    props.onSubmitSuccess && props.onSubmitSuccess(data);
+                }
             }
         )
         .catch(err => {
-            setError({_form: 'Invalid username and password'});
+            setError({_form: err.toString()});
         });
+        // fetch(`${USER_API_URL}/login`, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json' 
+        //     },
+        //     body: JSON.stringify({
+        //         username: values.username,
+        //         password: values.password
+        //     })
+        // })
+        // .then(
+        //     res => {
+        //         if(res.status === 200){
+        //             return res.json();
+        //         }
+        //         throw new Error(res.statusText);
+        //     }
+        // )
+        // .then(
+        //     json => {
+        //         setSubmitting(false);
+        //         resetForm();
+        //         console.log('JSON', json);
+        //         props.onSubmitSuccess && props.onSubmitSuccess(json);
+        //     }
+        // )
+        // .catch(err => {
+        //     setError({_form: 'Invalid username and password'});
+        // });
     },
 
     validateOnChange: false,
@@ -98,25 +130,27 @@ class AdminLoginPage extends React.Component {
     }
 
     onSubmitSuccess(data){
-        const { login } = this.props;
+        const { updateLoginUser } = this.props;
         const user = {
-            username: data.username,
-            token: data.token
+            username: data.login.username,
+            token: data.login.token
         };
-        login && login(user);
+        updateLoginUser && updateLoginUser(user);
         sessionStorage.setItem('user', JSON.stringify(user));
         this.props.history.push('/admin/book');
     }
 
     render(){
         const { formBuilderData } = this.state;
-
+        const { login } = this.props;
+        
         return(
             <div className='admin-login-page'>
                 <div className='wrap-lg'>
                     <LoginFormBuilder 
                         formBuilderData={formBuilderData}
                         onSubmitSuccess={this.onSubmitSuccess}
+                        login={login}
                     />
                 </div>
             </div>
@@ -125,11 +159,22 @@ class AdminLoginPage extends React.Component {
 }
 
 
-export default connect(
-    state => ({
-        user: state.user
-    }),
-    dispatch => ({
-        login: data => dispatch({ type: 'FETCH_USER_SUCCESS', payload: data })
-    })
+// export default connect(
+//     state => ({
+//         user: state.user
+//     }),
+//     dispatch => ({
+//         login: data => dispatch({ type: 'FETCH_USER_SUCCESS', payload: data })
+//     })
+// )(AdminLoginPage);
+export default compose(
+    connect(
+        state => ({
+            user: state.user
+        }),
+        dispatch => ({
+            updateLoginUser: data => dispatch({ type: 'FETCH_USER_SUCCESS', payload: data })
+        })
+    ),
+    graphql(LOGIN_MUTATION, { name: 'login' })
 )(AdminLoginPage);
