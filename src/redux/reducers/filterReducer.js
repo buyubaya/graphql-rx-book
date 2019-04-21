@@ -5,8 +5,9 @@ import {
 
 
 export const defaultFilter = {
-	limit: 2,
-	page: 1
+	limit: 5,
+	page: 1,
+	sort: 'oldest'
 };
 
 const filterReducer = (state={...defaultFilter}, action) => {

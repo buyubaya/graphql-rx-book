@@ -1,12 +1,12 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import {
-    filterRequest
-} from '../redux/actions';
 
 
-const SortBox = ({filter, sort}) => (
-	<select className="sort-box" onChange={e => sort(e.target.value)}>
+const SortBox = ({value, onChange}) => (
+    <select 
+        className="sort-box"
+        value={value} 
+        onChange={e => onChange(e.target.value)}
+    >
         <option value={'latest'}>Latest</option>
         <option value={'oldest'}>Oldest</option>
         <option value={'a-z'}>A - Z</option>
@@ -17,11 +17,4 @@ const SortBox = ({filter, sort}) => (
 );
 
 
-export default connect(
-	state => ({
-		filter: state.filter
-	}),
-	dispatch => ({
-		sort: q => dispatch(filterRequest({sort: q, page: 1}))
-	})
-)(SortBox);
+export default SortBox;

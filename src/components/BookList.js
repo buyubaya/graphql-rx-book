@@ -1,6 +1,5 @@
 import React from 'react';
-import { bindActionCreators  } from 'redux';
-import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import Book from './Book';
 import Pagination from './Pagination';
 import Loading from './Loading';
@@ -10,58 +9,137 @@ import FilterBox from './FilterBox';
 import ClearFilter from './ClearFilter';
 import CartTable from './CartTable';
 // APOLLO
-import { compose, graphql } from "react-apollo";
+import { compose, graphql, Query } from "react-apollo";
 import gql from "graphql-tag";
 // QUERY AND MUTATION
 const BOOK_QUERY = gql`
-	query book($page: Int){
-		book(page: $page) {			
-			...on BookListResponse {
+	query book($id: ID, $page: Int, $limit: Int) {
+		book(id: $id, page: $page, limit: $limit) {
+			... on BookListResponse {
 				list {
 					_id
 					name
 					price
 					img
+					category {
+						_id
+						name
+					}
 				}
 				count
+			}
+
+			... on Book {
+				_id
+				name
 			}
 		}
 	}
 `;
+const CATEGORY_QUERY = gql`
+	query category($id: ID) {
+		category(id: $id) {
+			_id
+			name
+		}
+	}
+`;
+const AUTHOR_QUERY = gql`
+	query author($id: ID) {
+		author(id: $id) {
+			_id
+			name
+		}
+	}
+`;
+const BRAND_QUERY = gql`
+	query brand($id: ID) {
+		brand(id: $id) {
+			_id
+			name
+		}
+	}
+`;
+// RENDERING
+// const renderQuery = Comp => props => ({ loading, error, data }) => {
+// 	if (loading) return 'Loading...';
+// 	if (error) return `Error! ${error.message}`;
+
+// 	return <Comp {...props} data={data['category']} />;
+// };
+// const CustomQuery = Comp => props => {
+// 	return(
+// 		<Query query={props.query}>
+// 			{({ loading, error, data }) => {
+// 				if (loading) return "Loading...";
+// 				if (error) return `Error! ${error.message}`;
+
+// 				return (
+// 					<Comp {...props} />
+// 				);
+// 			}}
+// 		</Query>
+// 	);
+// };
+const renderQuery = comp => ({ loading, error, data }) => {
+	if (loading) return "Loading...";
+	if (error) return `Error! ${error.message}`;
+	
+	return React.cloneElement(comp, { data: data[comp.props.filterName] });
+};
+const CustomQuery = (props) => {
+	
+	return(
+		<Query {...props}>
+			{
+				({ loading, error, ...rest }) => {
+					if (loading) return "Loading...";
+					if (error) return `Error! ${error.message}`;
+					
+					return props.children(rest);
+				}
+			}
+		</Query>
+	);
+};
 
 
-function BookList(props){
+function BookList(props, context) {
 	let icon_cart;
-	const { filter, cart } = props;
+	const { bookData } = props;
+	const { filter, setFilter, cart } = context;
 	const totalQty = cart.list && cart.list.reduce((total, current) => total + current.qty, 0);
-	const { book } = props.bookQuery;
-	const list = book && book.list;
-	const count = book && book.count;
+	const list = bookData && bookData.list;
+	const count = bookData && bookData.count;
 
-	function handleClickIconCart(e){
+	function handleClickIconCart(e) {
 		e.stopPropagation();
 		icon_cart.classList.toggle('is-active');
 	}
 
-	function handlePageChange(page){
-		const { setLoading, setFilter } = props;
-		const { fetchMore } = props.bookQuery;
-
-		setLoading(true);
-        fetchMore && fetchMore({
-            variables: { page },
-            updateQuery: (prevResult, { fetchMoreResult }) => ({
-                ...prevResult,
-                book: fetchMoreResult.book
-            })
-        })
-        .then((res) => {
-			setLoading(false);
-			setFilter({ page });
-        });
+	function handlePageChange(page) {
+		props.onPageChange && props.onPageChange(page);
 	}
 
-	return(
+	function handleSearchChange(value) {
+		const { filter, setFilter } = context;
+		setFilter && setFilter({
+			...filter,
+			search: value,
+			page: 1
+		});
+	}
+
+	function handleSortChange(value) {
+		const { filter, setFilter } = context;
+		setFilter && setFilter({
+			...filter,
+			sort: value,
+			page: 1
+		});
+	}
+
+	return (
 		<div className='products-page'>
 			<div className='cart-area text-right'>
 				<span id='icon-cart' ref={el => icon_cart = el} onClick={handleClickIconCart}>
@@ -76,30 +154,69 @@ function BookList(props){
 			<div className='filter-area'>
 				<div className='filter-row row'>
 					<div className='column column-8-sm'>
-						<SearchBox />
+						<SearchBox value={filter['search'] || ''} onChange={handleSearchChange} />
 					</div>
 					<div className='column column-4-sm'>
-						<SortBox />
+						<SortBox value={filter['sort'] || ''} onChange={handleSortChange} />
 					</div>
 				</div>
 				<div className='filter-row row'>
 					<div className='column column-4-sm'>
-						<FilterBox 
-							filterName='category'
-							placeholder='Select category'
-						/>
+						<CustomQuery query={CATEGORY_QUERY}>
+							{({ data }) => (
+								<FilterBox
+									filterName='category'
+									placeholder='Select category'
+									data={data['category']}
+									value={filter['category'] || ''}
+									onChange={value => {
+										setFilter && setFilter({
+											...filter,
+											category: value,
+											page: 1
+										});
+									}}
+								/>
+							)}
+						</CustomQuery>
 					</div>
 					<div className='column column-4-sm'>
-						<FilterBox 
-							filterName='author'
-							placeholder='Select author'
-						/>
+						<CustomQuery query={AUTHOR_QUERY}>
+							{({ data }) => (
+								<FilterBox
+									filterName='author'
+									placeholder='Select author'
+									data={data['author']}
+									value={filter['author'] || ''}
+									onChange={value => {
+										setFilter && setFilter({
+											...filter,
+											author: value,
+											page: 1
+										});
+									}}
+								/>
+							)}
+						</CustomQuery>
 					</div>
 					<div className='column column-4-sm'>
-						<FilterBox 
-							filterName='brand'
-							placeholder='Select brand'
-						/>
+						<CustomQuery query={BRAND_QUERY}>
+							{({ data }) => (
+								<FilterBox
+									filterName='brand'
+									placeholder='Select brand'
+									data={data['brand']}
+									value={filter['brand'] || ''}
+									onChange={value => {
+										setFilter && setFilter({
+											...filter,
+											brand: value,
+											page: 1
+										});
+									}}
+								/>
+							)}
+						</CustomQuery>
 					</div>
 				</div>
 				<ClearFilter />
@@ -110,47 +227,31 @@ function BookList(props){
 			<Loading />
 			{/* BEGIN BOOK LIST */}
 			{
-			<div className='card-list'>
-				{
-					list && list.map(item =>
-						<Book item={item} key={item._id} />
-					)
-				}
-			</div>
+				<div className='card-list'>
+					{
+						list && list.map(item =>
+							<Book item={item} key={item._id} />
+						)
+					}
+				</div>
 			}
 			{/* END BOOK LIST */}
-			<Pagination 
-				page={filter.page} 
+			<Pagination
+				page={filter.page}
 				limit={filter.limit}
-				maxPage={5} 
-				count={count} 
+				maxPage={5}
+				count={count}
 				onPageChange={handlePageChange}
 			/>
 		</div>
 	);
 };
 
+BookList.contextTypes = {
+	filter: PropTypes.object,
+	setFilter: PropTypes.func,
+	cart: PropTypes.object
+};
 
-export default compose(
-	connect(
-		state => ({
-			list: state.product.list,
-			count: state.product.count,
-			filter: state.filter,
-			cart: state.cart,
-			all: state
-		}),
-		dispatch => bindActionCreators({
-			setLoading: status => ({ type: status ? 'IS_LOADING' : 'STOP_LOADING'}),
-			setFilter: options => ({ type: 'IS_FILTERED', payload: options })
-		}, dispatch)
-	),
-	graphql(BOOK_QUERY, { 
-		name: 'bookQuery',
-		options: props => ({
-			variables: {
-				page: 1
-			}
-		}) 
-	})
-)(BookList);
+
+export default BookList;

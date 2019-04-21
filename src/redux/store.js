@@ -7,9 +7,9 @@ import statusReducer from './reducers/statusReducer';
 import cartReducer from './reducers/cartReducer';
 import userReducer from './reducers/userReducer';
 // EPICS
-import productEpic from './epics/productEpic';
-import filterEpic from './epics/filterEpic';
-import clearFilterEpic from './epics/clearFilterEpic';
+// import productEpic from './epics/productEpic';
+// import filterEpic from './epics/filterEpic';
+// import clearFilterEpic from './epics/clearFilterEpic';
 
 
 const reducers = combineReducers({
@@ -21,9 +21,10 @@ const reducers = combineReducers({
 });
 
 
-const epics = combineEpics(productEpic, filterEpic, clearFilterEpic);
-const rootEpic = createEpicMiddleware(epics);
-const store = createStore(reducers, applyMiddleware(rootEpic));
+// const epics = combineEpics(productEpic, filterEpic, clearFilterEpic);
+// const rootEpic = createEpicMiddleware(epics);
+// const store = createStore(reducers, applyMiddleware(rootEpic));
+const store = createStore(reducers);
 
 
 export default store;

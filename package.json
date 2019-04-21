@@ -39,5 +39,8 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "node-fetch": "^2.3.0"
+  }
 }

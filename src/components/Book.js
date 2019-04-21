@@ -78,7 +78,7 @@ const Book = ({item, isAlert, showAlert, hideAlert, cart, addToCart}) => {
 	return(        
 		<div className="card-product mb40">
 			<div className="card-img">
-				<Link to={'product/'+item._id}><img className="w100p" src={item.img} alt="" ref={el => cardImg = el} /></Link>
+				<Link to={'/product/'+item._id}><img className="w100p" src={item.img} alt="" ref={el => cardImg = el} /></Link>
 			</div>
 			<div className="card-content pt10">
 				<p className="card-name text-center">{item.name}</p>

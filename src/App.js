@@ -3,6 +3,7 @@ import './App.css';
 import 'rxjs';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
+import BookDetailPage from './pages/BookDetailPage';
 import AdminPage from './pages/admin/AdminPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminBookPage from './pages/admin/AdminBookPage';
@@ -17,6 +18,7 @@ class App extends Component {
 			<BrowserRouter basename={process.env.PUBLIC_URL}>
 				<Switch>
 					<Route path='/' exact component={HomePage} />
+					<Route path='/product/:bookId' exact component={BookDetailPage} />
 					<Route path='/user/login' exact component={AdminLoginPage} />
 					<Route path='/user/logout' exact component={AdminLogoutPage} />
 					<Route path='/admin'>

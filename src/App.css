@@ -2691,3 +2691,32 @@ body {
 .overlay.is-active {
 	display: block;
 }
+
+
+.section-title {
+	color: #a1822b;
+	font-size: 1.5rem;
+	text-align: center;
+	margin: 40px auto;
+}
+
+.section-title span {
+	display: inline-block;
+	padding: 10px 0;
+	border-bottom: 2px solid #a1822b;
+}
+
+
+.book-detail-area {
+	display: flex;
+	align-items: center;
+}
+
+.book-detail-img {
+	width: 200px;
+}
+
+.book-detail-info th, .book-detail-info td {
+	text-align: left;
+	padding: 5px 20px 5px 0;
+}

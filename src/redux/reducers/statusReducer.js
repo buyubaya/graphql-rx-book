@@ -1,7 +1,8 @@
 import {
     FETCH_PRODUCT_REQUEST,
     FETCH_PRODUCT_SUCCESS,
-    IS_FILTERED,
+	IS_FILTERED,
+	CLEAR_FILTER,
     SHOW_ALERT,
 	HIDE_ALERT,
 	IS_LOADING,
@@ -21,6 +22,8 @@ const statusReducer = (state={}, action) => {
 			return {...state, isLoading: false};
 		case IS_FILTERED:
 			return {...state, isFiltered: action.payload};	
+		case CLEAR_FILTER:
+			return {...state, isFiltered: false};
 		case SHOW_ALERT:
 			return {...state, showAlert: action.payload};
 		case HIDE_ALERT:
