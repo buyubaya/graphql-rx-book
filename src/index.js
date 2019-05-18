@@ -21,7 +21,8 @@ const fragmentMatcher = new IntrospectionFragmentMatcher({
     introspectionQueryResultData
 });
 // APOLLO CLIENT
-const GRAPHQL_ENDPOINT = '//localhost:4000/graphql';
+// const GRAPHQL_ENDPOINT = '//localhost:4000/graphql';
+const GRAPHQL_ENDPOINT = 'https://graphql-nodejs-book-api.herokuapp.com/graphql';
 
 
 const client = new ApolloClient({
