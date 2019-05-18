@@ -9,27 +9,35 @@ import store from './redux/store';
 import { ApolloClient } from 'apollo-client';
 import { ApolloProvider } from 'react-apollo';
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory';
+import { HttpLink } from 'apollo-link-http';
+import { onError } from 'apollo-link-error';
+import { ApolloLink, split } from 'apollo-link';
 import { createUploadLink } from 'apollo-upload-client';
+import { WebSocketLink } from 'apollo-link-ws';
+import { getMainDefinition } from 'apollo-utilities';
 import introspectionQueryResultData from './fragmentTypes.json';
 // FRAGMENT MATCHER
 const fragmentMatcher = new IntrospectionFragmentMatcher({
     introspectionQueryResultData
 });
 // APOLLO CLIENT
+const GRAPHQL_ENDPOINT = '//localhost:4000/graphql';
+
+
 const client = new ApolloClient({
     // uri: 'http://localhost:3001/graphql',
-    cache: new InMemoryCache({ fragmentMatcher  }).restore(),
-    link: createUploadLink({ uri: 'http://localhost:4000/graphql' })
+    cache: new InMemoryCache({ fragmentMatcher }).restore(),
+    link: createUploadLink({ uri: GRAPHQL_ENDPOINT })
 });
 
 
 ReactDOM.render(
-<ApolloProvider client={client}>
-    <Provider store={store}>
-        <App />
-    </Provider>
-</ApolloProvider>
-, document.getElementById('root'));
+    <ApolloProvider client={client}>
+        <Provider store={store}>
+            <App />
+        </Provider>
+    </ApolloProvider>
+    , document.getElementById('root'));
 
 
 // If you want your app to work offline and load faster, you can change

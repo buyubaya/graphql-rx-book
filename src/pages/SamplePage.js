@@ -1,7 +1,7 @@
 import React from 'react';
 import { compose } from 'redux';
 // APOLLO
-import { Query, Mutation, graphql } from "react-apollo";
+import { Query, Mutation, Subscription, graphql } from "react-apollo";
 import gql from "graphql-tag";
 // QUERY AND MUTATION
 const BOOK_QUERY = gql`
@@ -51,7 +51,7 @@ const LOGIN_MUTATION = gql`
 //           proxy.writeQuery({ query: uploadsQuery, data })
 //         }
 //       })
-  
+
 //     return <input type="file" required onChange={handleChange} />
 // };
 // UploadFile = graphql(gql`
@@ -64,9 +64,27 @@ const LOGIN_MUTATION = gql`
 //         }
 //     }
 // `)(UploadFile);
+const COMMENTS_SUBSCRIPTION = gql`
+    subscription {
+        message
+    }
+`;
+
+const TestSub = () => (
+    <Subscription
+        subscription={COMMENTS_SUBSCRIPTION}
+    >
+        {({ data, loading, error }) => {
+            return(
+                <h4>HELLO SUB {data && data.message}</h4>
+            );
+        }}
+    </Subscription>
+);
+
 
 class SamplePage extends React.Component {
-    constructor(){
+    constructor() {
         super();
         this.state = {
             bookList: [],
@@ -74,9 +92,9 @@ class SamplePage extends React.Component {
         };
     }
 
-    componentWillReceiveProps(newProps){
+    componentWillReceiveProps(newProps) {
         console.log('RECEIVE', newProps);
-        if(newProps.bookQuery.loading === false){
+        if (newProps.bookQuery.loading === false) {
             this.setState({ bookList: newProps.bookQuery.book });
         }
     }
@@ -86,15 +104,15 @@ class SamplePage extends React.Component {
         console.log('FILE', file, this.file.validity);
         this.props.login && this.props.login({
             variables: {
-                username: this.username.value, 
+                username: this.username.value,
                 password: this.password.value,
                 file
             }
         })
-        .then(({ data }) => {
-            this.setState({ loginError: data && data.login.error });
-            console.log('LOG IN', data);
-        });
+            .then(({ data }) => {
+                this.setState({ loginError: data && data.login.error });
+                console.log('LOG IN', data);
+            });
     }
 
     handleLoadMore = () => {
@@ -106,10 +124,10 @@ class SamplePage extends React.Component {
                 book: [fetchMoreResult.book]
             })
         })
-        .then(({ data, errors, loading }) => {
-            console.log('FETCH MORE', data);
-            this.setState({ bookList: data.book });
-        });
+            .then(({ data, errors, loading }) => {
+                console.log('FETCH MORE', data);
+                this.setState({ bookList: data.book });
+            });
     }
 
     // _renderLoginForm(login, { data }){
@@ -143,25 +161,28 @@ class SamplePage extends React.Component {
     //     );
     // }
 
-    render(){
+    render() {
         const { bookList, loginError } = this.state;
 
-        return(
+        return (
             <div>
+                <h1>TEST SUB</h1>
+                <TestSub />
+
                 {
                     bookList && bookList.map(item =>
                         <div key={item._id}>
                             {item.name}
-                        </div>    
+                        </div>
                     )
                 }
                 <button onClick={this.handleLoadMore}>LOAD MORE</button>
-                
+
                 <div>
                     <input type='text' ref={el => this.username = el} />
                     <input type='password' ref={el => this.password = el} />
                     <input type='file' ref={el => this.file = el} />
-                    <button 
+                    <button
                         onClick={this.handleClick}
                     >
                         Login
@@ -192,7 +213,7 @@ class SamplePage extends React.Component {
 
 
 export default compose(
-    graphql(BOOK_QUERY, {name: 'bookQuery'}),
-    graphql(LOGIN_MUTATION, {name: 'login'})
+    graphql(BOOK_QUERY, { name: 'bookQuery' }),
+    graphql(LOGIN_MUTATION, { name: 'login' })
 )(SamplePage);
 // export default UploadFile;

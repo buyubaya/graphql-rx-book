@@ -6,10 +6,16 @@
   "dependencies": {
     "apollo-boost": "^0.1.28",
     "apollo-cache-inmemory": "^1.5.1",
+    "apollo-client": "^2.5.1",
+    "apollo-link": "^1.2.11",
+    "apollo-link-error": "^1.1.10",
+    "apollo-link-http": "^1.5.14",
+    "apollo-link-ws": "^1.0.17",
     "apollo-upload-client": "^10.0.0",
     "formik": "^1.4.3",
     "gh-pages": "^2.0.1",
     "graphql": "^14.1.1",
+    "graphql-tag": "^2.10.1",
     "react": "^16.8.3",
     "react-apollo": "^2.4.1",
     "react-dom": "^16.7.0",
@@ -21,7 +27,8 @@
     "redux": "^4.0.1",
     "redux-observable": "^0.18.0",
     "rxjs": "^5.0.0",
-    "rxjs-compat": "^6.3.3"
+    "rxjs-compat": "^6.3.3",
+    "subscriptions-transport-ws": "^0.9.16"
   },
   "scripts": {
     "start": "react-scripts start",
